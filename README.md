@@ -8,3 +8,7 @@ javascript
 - IndexedDB
 - polyfill
 - WebCredential
+
+# 1차 변경
+<img width="{100%}" src="{https://user-images.githubusercontent.com/75015048/147901767-d161d578-530a-4e29-bba2-45993c829d80.gif}"/>
+
