@@ -32,7 +32,8 @@
 	<div class="container">
 		<div class="card-panel">
 			<h1>Demo Wallet</h1>
-			<p>페이지 로딩에서 'Accept'를 클릭하면 이 페이지가 브라우저에 등록되어 테스트 월렛 역할 수행 가능</p>
+			<a class="waves-effect waves-light btn" href="${pageContext.request.contextPath }/">Home</a>  
+			<p>페이지 로딩에서 'Allow'를 클릭하면 이 페이지가 브라우저에 등록되어 테스트 월렛 역할 수행 가능</p>
 
 			<div class="card-panel hide" id="logged-in">
 				<p>
@@ -71,11 +72,6 @@
 	    document.getElementById('logoutButton').addEventListener('click', logout);
 	    refreshUserArea();
 	  });
-	  
-	  
-	  // document.getElementById('loginButton').addEventListener('click', login(document.getElementById('name').value) );
-	  
-	  
 	</script>
 	<script
 		src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>

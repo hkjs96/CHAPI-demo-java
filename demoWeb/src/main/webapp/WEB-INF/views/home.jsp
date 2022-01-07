@@ -20,7 +20,7 @@
 </head>
 <body>
 <h1>
-	Demo Web  
+	Demo Web
 </h1>
 
 <%-- <P>  현재 로케일은 ${localeInfo.displayName}. </P>

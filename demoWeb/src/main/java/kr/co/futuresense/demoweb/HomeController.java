@@ -1,12 +1,19 @@
 package kr.co.futuresense.demoweb;
 
-import java.text.DateFormat;
-import java.util.Date;
-import java.util.Locale;
+import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.io.IOUtils;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class HomeController {
@@ -61,5 +68,24 @@ public class HomeController {
 	@RequestMapping("wallet-ui-store")
 	public String walletUiStore() {
 		return "wallet-ui-store";
+	}
+	
+	//
+	//
+	//
+	@PostMapping(value = "/createJws", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public String createJws( HttpServletRequest req , Model model) {
+
+		String data = null;
+		try {
+			data = IOUtils.toString(req.getReader());
+			data = "";
+			data = JWS.create(data);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return data;
 	}
 }

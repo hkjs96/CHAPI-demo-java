@@ -19,6 +19,7 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 	
 	<script src='<c:url value="/js/mock-user-management.js" />'></script>
+	<script src='<c:url value="/js/uuid.js" />'></script>
 	
 	<title>DemoWeb</title>
 </head>
@@ -26,12 +27,9 @@
 	<div class="container">
 		<div class="card-panel">
 			<h1>Verified Credential Issuer</h1>
+			<a class="waves-effect waves-light btn" href="${pageContext.request.contextPath }/">Home</a><hr>
 			
 			<form>
-				<!-- <div class="input-field ">
-					<label for="name">이름</label>
-					<input type="text" name="name" value="" id="user">
-				</div> -->
 				<div class="input-field">
 					<select name="issuer" id="issuer">
 						<option value="" disabled selected>선택하세요.</option>
@@ -71,6 +69,7 @@
 	  	이름과 발급 기관을 입력 받아 해당하는 VC를 만들기 위함.
 	  */
 	  async function onClickReceive() {
+//	  function onClickReceive() {
 	      // let uname = document.getElementById('user');
 	      // let issuer = document.getElementById('issuer');
 	      let issuer = $("#issuer option:selected");
@@ -89,14 +88,15 @@
           let today = new Date();
           // 현재 포멧에는 Date.toISOString() 메서드를 사용하는 것이 맞다.
           // console.log(today.toISOString());
-
+                    
           /*
           	dataset
           	 - ctype : credentialType
           	 - cid : credential issuer 의 id에 들어가는 값
           	 - credential-id : credential 의 DID의 method  
           */
-          const testCredential = {
+          // const testCredential = {
+          let testCredential = {
               "@context": [
                   "https://www.w3.org/2018/credentials/v1",
                   /* "https://www.w3.org/2018/credentials/examples/v1" */
@@ -114,13 +114,16 @@
                   /* "type": ["VerifiableCredential", "UniversityDegreeCredential"], */
                   "type": ["VerifiableCredential", issuer.data('ctype')],
                   /* "issuer": "https://example.edu/issuers/565049", */
-                  "issuer": issuer.data('ctype') + "issuer/565049",
+                  /* "issuer": issuer.data('ctype') + "issuer/565049", */
+                  "issuer": issuer.data('ctype') + "issuer/" + Math.floor(Math.random() * 999999 + 1) ,
                   "issuanceDate": "2010-01-01T19:73:24Z",
                   "credentialSubject": {
                       /* "id": "did:example:ebfeb1f712ebc6f1c276e12ec21", */
-                      "id": "did:" + issuer.data('credentialId') + ":ebfeb1f712ebc6f1c276e12ec21",
+                      /* "id": "did:" + issuer.data('credentialId') + ":ebfeb1f712ebc6f1c276e12ec21", */
+                      "id": "did:" + issuer.data('credentialId') + ":" + getUUID(),
                       "alumniOf": {
-                          "id": "did:" + issuer.data('credentialId') + ":c276e12ec21ebfeb1f712ebc6f1",
+                          /* "id": "did:" + issuer.data('credentialId') + ":c276e12ec21ebfeb1f712ebc6f1", */
+                          "id": "did:" + issuer.data('credentialId') + ":" + getUUID(),
                           "name": {
                               /* "@value": "Example University", */
                               "@value": issuer.val(),
@@ -136,28 +139,27 @@
                       /* "verificationMethod": "https://example.edu/issuers/keys/1", */
                       "verificationMethod": issuer.data('cid') + "issuers/keys/1",
                       "jws": "eyJhbGciOiJSUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..TCYt5XsITJX1CxPCT8yAV-TVkIEq_PbChOMqsLfRoPsnsgw5WEuts01mq-pQy7UJiN5mgRxD-WUcX16dUEMGlv50aqzpqh4Qktb3rk-BuQy72IFLOqV0G_zS245-kronKb78cPN25DGlcTwLtjPAYuNzVBAh4vGHSrQyHUdBBPM"
+                      // "jws": ""
                   }
               }]
           };
+          
+          /*
+          	여기 AJAX로 데이터 보내는 부분 JSON 데이터로 보낼 수 있게 준비해야한다.
+          	컨트롤러에서 못받는다. 넘어오는건 String으로 넘어오게 처리했다.
+          */
 	      
-
-
-	      // document.getElementById('storeResults').innerHTML = ''; // clear results
-
-	      // Construct the WebCredential wrapper around the credential to be stored
-	      const credentialType = 'VerifiablePresentation';
-	      
-	      console.log(testCredential);
+          let cdata = JSON.stringify(testCredential);
+          
+          let ajax = new XMLHttpRequest();
+          const url = '${pageContext.request.contextPath }/createJws';
+          
+		  const credentialType = 'VerifiablePresentation';
 	      
 	      const webCredentialWrapper = new WebCredential(
 	          credentialType, testCredential, {
 	              recommendedHandlerOrigins: [
-	                  /* 
-	                  	이부분 수정해야함
-	                  */
-	                  /* 'https://chapi-demo-wallet.digitalbazaar.com' */
 	                  window.location.hostname
-	                  // '나중에 수정해야되는 부분 여기 들어갈 값은 우리의 브라우저 도메인.'
 	              ]
 	          });
 
@@ -166,6 +168,8 @@
 	      // Use Credential Handler API to store
 	      const result = await navigator.credentials.store(webCredentialWrapper);
 
+	      console.log(result);
+	      
 	      if (!result) {
 	          return;
 	      }
@@ -174,14 +178,54 @@
 	      document.getElementById('storeResults').innerText = JSON.stringify(result, null, 2);
 
 	      console.log('Result of receiving via store() request:', result);
-
-	      /* if(!result) {
-	      document.getElementById('storeResults').innerHTML = 'null result';
-	      return;
-	    }
-	
-	    document.getElementById('storeResults').innerHTML = JSON.stringify(result.data, null, 2); */
+          
+	      /*
+	      
+	      jws 생성한 것이 저장하면 ctore 함수로 보내면 들어가지 않는다.
+          ajax.onreadystatechange = function() {
+        	  let jws = '';
+       		  jws = ajax.response
+       		  console.log(jws);
+       		  testCredential['verifiableCredential'][0]['proof']['jws'] = jws;
+       		  const credential = testCredential;
+       		  console.log(credential);
+       		  cstore(credential);
+          };
+          ajax.open("POST", url, true); // ajax.open("POST", url, true);
+          ajax.setRequestHeader("Content-Type", "application/json");
+          ajax.send(cdata);
+          */
 	  }
+          
+      /*    
+	  async function cstore(testCredential) {
+		// Construct the WebCredential wrapper around the credential to be stored
+	      const credentialType = 'VerifiablePresentation';
+	      
+	      const webCredentialWrapper = new WebCredential(
+	          credentialType, testCredential, {
+	              recommendedHandlerOrigins: [
+	                  window.location.hostname
+	              ]
+	          });
+
+	      document.getElementById('storeResults').innerText = 'Credential 을 저장 중 입니다.';
+
+	      // Use Credential Handler API to store
+	      const result = await navigator.credentials.store(webCredentialWrapper);
+
+	      console.log(result);
+	      
+	      if (!result) {
+	          return;
+	      }
+
+	      document.getElementById('resultsPanel').classList.remove('hide');
+	      document.getElementById('storeResults').innerText = JSON.stringify(result, null, 2);
+
+	      console.log('Result of receiving via store() request:', result);
+      }
+      */
 
 	  function ready(fn) {
 	      if (document.readyState !== 'loading') {
@@ -196,8 +240,6 @@
 	      console.log('Document ready.')
 
 	      $('select').formSelect();
-	      /* var elems = document.querySelectorAll('select');
-  	var instances = M.FormSelect.init(elems, options); */
 	  })
 
 	  const MEDIATOR = 'https://authn.io/mediator' + '?origin=' +

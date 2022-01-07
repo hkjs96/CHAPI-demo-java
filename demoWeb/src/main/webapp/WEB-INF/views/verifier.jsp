@@ -24,7 +24,8 @@
 	<div class="container">
 	  <div class="card-panel">
 		<h1>Credential Verifier</h1>
-	
+		<a class="waves-effect waves-light btn" href="${pageContext.request.contextPath }/">Home</a>
+		<hr>
 	    <a class="waves-effect waves-light btn" id="requestButton">Credential 보내기</a>
 	  </div>
 	
